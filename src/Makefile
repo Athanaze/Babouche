@@ -25,7 +25,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj
 DEP_RELEASE =
-OUT_RELEASE = ../bin/matrix
+OUT_RELEASE = ../bin/babouche
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/Matrices.o $(OBJDIR_RELEASE)/Model.o $(OBJDIR_RELEASE)/main.o
 
