@@ -193,47 +193,6 @@ int initGLUT(int argc, char **argv)
     return handle;
 }
 
-// write 2d text using GLUT
-// The projection matrix must be set to orthogonal before call this function.
-void drawString(const char *str, int x, int y, float color[4], void *font)
-{
-    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT); // lighting and color mask
-    glDisable(GL_LIGHTING);     // need to disable lighting for proper text color
-    glDisable(GL_TEXTURE_2D);
-
-    glColor4fv(color);          // set text color
-    glRasterPos2i(x, y);        // place text position
-
-    // loop all characters in the string
-    while(*str)
-    {
-        glutBitmapCharacter(font, *str);
-        ++str;
-    }
-
-    glEnable(GL_TEXTURE_2D);
-    glPopAttrib();
-}
-// draw a string in 3D space
-void drawString3D(const char *str, float pos[3], float color[4], void *font)
-{
-    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT); // lighting and color mask
-    glDisable(GL_LIGHTING);     // need to disable lighting for proper text color
-    glDisable(GL_TEXTURE_2D);
-
-    glColor4fv(color);          // set text color
-    glRasterPos3fv(pos);        // place text position
-
-    // loop all characters in the string
-    while(*str)
-    {
-        glutBitmapCharacter(font, *str);
-        ++str;
-    }
-
-    glDisable(GL_TEXTURE_2D);
-    glPopAttrib();
-}
 // initialize global variables
 bool initSharedMem()
 {
@@ -279,31 +238,6 @@ void setCamera(float eyeX, float eyeY, float eyeZ, float targetX, float targetY,
     Vector3 trans(0, 0, -distance);
     matrixView.setColumn(3, trans);
 }
-/*
-//display info messages
-void showInfo()
-{
-    // backup current model-view matrix
-    glPushMatrix();                     // save current modelview matrix
-    glLoadIdentity();                   // reset modelview matrix
-
-    // set to 2D orthogonal projection
-    glMatrixMode(GL_PROJECTION);        // switch to projection matrix
-    glPushMatrix();                     // save current projection matrix
-    glLoadIdentity();                   // reset projection matrix
-    gluOrtho2D(0, screenWidth, 0, screenHeight); // set to orthogonal projection
-
-    //float color[4] = {1, 1, 1, 1};
-
-    //drawString(TOP_RIGHT_CORNER_MSG, 0, screenHeight-TEXT_HEIGHT, color, font);
-
-    // restore projection matrix
-    glPopMatrix();                   // restore to previous projection matrix
-
-    // restore modelview matrix
-    glMatrixMode(GL_MODELVIEW);      // switch to modelview matrix
-    glPopMatrix();                   // restore to previous modelview matrix
-}*/
 // set projection matrix as orthogonal
 void toOrtho()
 {
@@ -361,33 +295,6 @@ void initGL()
     glClearDepth(1.0f);                         // 0 is near, 1 is far
     glDepthFunc(GL_LEQUAL);
 }
-// set a perspective frustum with 6 params similar to glFrustum()
-// (left, right, bottom, top, near, far)
-Matrix4 setFrustum(float l, float r, float b, float t, float n, float f)
-{
-    Matrix4 mat;
-    mat[0]  =  2 * n / (r - l);
-    mat[5]  =  2 * n / (t - b);
-    mat[8]  =  (r + l) / (r - l);
-    mat[9]  =  (t + b) / (t - b);
-    mat[10] = -(f + n) / (f - n);
-    mat[11] = -1;
-    mat[14] = -(2 * f * n) / (f - n);
-    mat[15] =  0;
-    return mat;
-}
-// set a symmetric perspective frustum with 4 params similar to gluPerspective
-// (vertical field of view, aspect ratio, near, far)
-Matrix4 setFrustum(float fovY, float aspectRatio, float front, float back)
-{
-    float tangent = tanf(fovY/2 * DEG2RAD);   // tangent of half fovY
-    float height = front * tangent;           // half height of near plane
-    float width = height * aspectRatio;       // half width of near plane
-
-    // params: left, right, bottom, top, near, far
-    return setFrustum(-width, width, -height, height, front, back);
-}
-
 //=============================================================================
 // CALLBACKS
 //=============================================================================
@@ -401,10 +308,10 @@ void reshapeCB(int w, int h)
 
     // set perspective viewing frustum
     glMatrixMode(GL_PROJECTION);
-    matrixProjection = setFrustum(45, (float)w/h, 1.0f, 100.0f);
-    glLoadMatrixf(matrixProjection.get());
+    //matrixProjection = setFrustum(45, (float)w/h, 1.0f, 100.0f);
+    //glLoadMatrixf(matrixProjection.get());
     //@@ the equivalent OpenGL call
-    //@@ gluPerspective(45.0f, (float)(w)/h, 1.0f, 100.0f); // FOV, AspectRatio, NearClip, FarClip
+    gluPerspective(45.0f, (float)(w)/h, 1.0f, 100.0f); // FOV, AspectRatio, NearClip, FarClip
 
     // switch to modelview matrix in order to set scene
     glMatrixMode(GL_MODELVIEW);
@@ -481,20 +388,4 @@ void mouseMotionCB(int x, int y)
 void exitCB()
 {
     clearSharedMem();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// set a orthographic frustum with 6 params similar to glOrtho()
-// (left, right, bottom, top, near, far)
-///////////////////////////////////////////////////////////////////////////////
-Matrix4 setOrthoFrustum(float l, float r, float b, float t, float n, float f)
-{
-    Matrix4 mat;
-    mat[0]  =  2 / (r - l);
-    mat[5]  =  2 / (t - b);
-    mat[10] = -2 / (f - n);
-    mat[12] = -(r + l) / (r - l);
-    mat[13] = -(t + b) / (t - b);
-    mat[14] = -(f + n) / (f - n);
-    return mat;
 }
