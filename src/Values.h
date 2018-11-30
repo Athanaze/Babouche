@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "HiddenValues.h"
 // N Particles related values
 const int NUMBER_OF_PARTICLES = 3000;
 const int N1 = NUMBER_OF_PARTICLES -1;
@@ -18,3 +19,25 @@ const float MAX_MASS = 100.0f;
 //Cuda calculations
 const int CUDA_BLOCK_SIZE = 1024;
 const int CUDA_N_BLOCKS = ((NUMBER_OF_PARTICLES*N1) /CUDA_BLOCK_SIZE) +1;
+
+////////////////////////////////////////////////
+// LOGGING VALUES
+////////////////////////////////////////////////
+/*
+
+FROM HiddenValues.h :
+
+//Logging into influxdb
+const char DB_ADDRESS[] = "XXX.XXX.X.XX";
+const char DB_TABLE_NAME[] = "XXXXXXXX";
+const char DB_USER_NAME[] = "XXXXXXX";
+const char DB_USER_PASS[] = "XXXXXXX";
+
+*/
+
+//Just leave it like that
+const int DB_PORT = 8086;
+
+//Logging words
+const char MEASUREMENT_NAME[] = "Babouche_performance";
+const char MEASUREMENT_FPS[] = "FPS";

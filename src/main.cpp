@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <GL/glut.h>
 #include <cstdlib>
-#include<ctime>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -13,6 +13,8 @@
 #include "Engine.h"
 
 #include "Model.h"
+
+#include "vendors/influxdb-cpp/influxdb.hpp"
 using std::stringstream;
 using std::ends;
 //MAIN LOOP
@@ -50,71 +52,26 @@ void displayCBEnd(){
 }
 int main(int argc, char **argv)
 {
-    // Matrix3 usage example ==================================================
-    Matrix3 m3_1(1,0,-2, -1,-2,-3, 1,1,0);  // column-major
-    Matrix3 m3_2 = m3_1;                    // copy from m3_1
-    m3_2.invert();                          // invert matrix
+    std::cout << "BABOUCHE ENGINE" <<std::endl;
+/*
+    //INFLUX DB STUFF
+    influxdb_cpp::server_info si("192.168.1.37", 8086, "sensor_data", "pi", "lousachir");
+    influxdb_cpp::builder()
+        .meas("Babouche_performance")
+        .field("FPS", 350)
+        .timestamp(1543600706)
+        .post_http(si);
+*/
 
-    // Matrix4 usage examples =================================================
-    // Note that Matrix4 is column-major order
-    // create (construct) matrix
-    float a[16] = { 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2 };
-    Matrix4 m1;                                             // with default ctor
-    Matrix4 m2(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);            // with 16 elements
-    Matrix4 m3(a);                                          // with array
-    Matrix4 m4(m3);                                         // with copy ctor, same as Matrix4 m4 = m3;
 
-    // accessors (getter/setter)
-    m1.set(a);                                              // init with array
-    m2.set(3,3,3,3, 3,3,3,3, 3,3,3,3, 3,3,3,3);             // init with 16 elements
-    m3 = m2;                                                // init with assignemt operator (=)
+    //INFLUX DB STUFF
+    influxdb_cpp::server_info si(DB_ADDRESS, DB_PORT, DB_TABLE_NAME, DB_USER_NAME, DB_USER_PASS);
+    influxdb_cpp::builder()
+        .meas(MEASUREMENT_NAME)
+        .field(MEASUREMENT_FPS, 350)
+        .timestamp(1543600706)
+        .post_http(si);
 
-    // subscript operator [] to access each element
-    m1[0] = 3;
-    // addition
-    m3 = m1 + m2;                                           // M3 = M1 + M2
-    // subtraction
-    m3 = m1 - m2;                                           // M3 = M1 - M2
-    // multiplication
-    m3 = m1 * m2;                                           // M3 = M1 * M2
-    m3 *= m1;                                               // M3 = M3 * M1 (= glMultMatrixf(M1))
-    // scalar product (pre-mult only, not available M * s)
-    m3 = 5 * m1;                                            // s * M
-    // vector multiplication
-    Vector3 v1 = Vector3(2,2,2);
-    Vector3 v2;
-    v2 = m1 * v1;                                           // vector product: M * v
-    v2 = v1 * m1;                                           // pre-product: v * M
-    // transpose
-    m3.set(1,1,1,1, 2,2,2,2, 3,3,3,3, 4,4,4,4);
-    m3.transpose();                                         // transpose
-    // determinant
-    m3.set(1,3,2,1, 0,0,1,0, 2,0,4,5, -1,5,-3,0);
-    // inverse of non-singluar
-    m3.set(1,0,0,0, 0,2,0,0, 0,0,3,0, 0,0,0,4);             // non-singular M
-    m3.invert();                                            // inverse
-    // invert Euclidean (rotation/reflection only)
-    m3.set(-1,0,0,0, 0,0.70711f,0.70711f,0, 0,-0.70711f,0.70711f,0, 1,2,3,1);
-    m3.invertEuclidean();                                   // inverse explicitly
-    // translate transform
-    m3.identity();
-    m3.translate(1, 2, 3);                                  // = glTranslatef(x, y, z)
-    //m3.translate(v1);
-    // rotate transform with degree
-    m3.identity();
-    m3.rotate(45, 0,1,0);                                   // = glRotatef(a, 1,0,0)
-    // rotate on basis axis (degree)
-    m3.identity();
-    m3.rotateX(45);                                         // = glRotatef(45, 1,0,0)
-    //m3.rotateY(45);                                         // = glRotatef(45, 0,1,0)
-    //m3.rotateZ(45);                                         // = glRotatef(45, 0,0,1)
-    // scale
-    m3.identity();
-    m3.scale(1, 2, 3);                                      // = glScalef(x, y, z)
-    // lookat
-    m3.identity();
-    m3.translate(0, 0, 0);
-    m3.lookAt(1, 0, -1);
     // init global vars
     initSharedMem();
     // register exit callback

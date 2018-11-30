@@ -33,6 +33,7 @@ const float EPSILON = 0.00001f;
 ///////////////////////////////////////////////////////////////////////////////
 Matrix2& Matrix2::transpose()
 {
+    std::cout << "Transpose" <<std::endl;
     std::swap(m[1],  m[2]);
     return *this;
 }

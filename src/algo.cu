@@ -92,6 +92,7 @@ extern "C" {
 
 	}
 
+	//Newton calculations
 	__global__
 	void newton(float *x,float *y,float *z,float *m,float *r,float *g,float *b,float *fX,float *fY,float *fZ) {
 		int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -131,6 +132,7 @@ extern "C" {
 		}
 	}
 
+	//Called once, at the begining
 	__host__ void setupCuda(){
 
 		// Allocate Unified Memory – accessible from CPU or GPU
@@ -168,6 +170,7 @@ extern "C" {
 	  std::cout << "CUDA_N_BLOCKS = " << CUDA_N_BLOCKS<< '\n';
 	  std::cout << "NUMBER_OF_PARTICLES = " <<NUMBER_OF_PARTICLES << '\n';
 	}
+
 	__host__ int newtonHost() {
 
 		std::clock_t start0;
@@ -188,7 +191,7 @@ extern "C" {
 
 
 		duration0 = ( std::clock() - start0 ) / (double) CLOCKS_PER_SEC;
-    	std::cout<< 1 / duration0 <<" FPS" <<'\n';
+    	//std::cout<< 1 / duration0 <<" FPS" <<'\n';
 
 		//std::clock_t start;
     	//double duration;
