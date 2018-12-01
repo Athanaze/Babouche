@@ -7,23 +7,31 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 #include "Matrices.h"
 #include "Vectors.h"
 
 #include "Engine.h"
 
 #include "Model.h"
+#include "Logger.h"
 
-#include "vendors/influxdb-cpp/influxdb.hpp"
 using std::stringstream;
 using std::ends;
 //MAIN LOOP
 void displayCB()
 {
+    // record start time
+    auto start = std::chrono::system_clock::now();
     displayCBStart();
     //All the logic / Model stuff is executed here, every frame
     updateModel();
     displayCBEnd();
+    // record end time
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end-start;
+    double fps = (double) 1 / diff.count();
+    Logger::addFPSData(fps);
 }
 void displayCBStart(){
     // clear buffer
@@ -53,24 +61,6 @@ void displayCBEnd(){
 int main(int argc, char **argv)
 {
     std::cout << "BABOUCHE ENGINE" <<std::endl;
-/*
-    //INFLUX DB STUFF
-    influxdb_cpp::server_info si("192.168.1.37", 8086, "sensor_data", "pi", "lousachir");
-    influxdb_cpp::builder()
-        .meas("Babouche_performance")
-        .field("FPS", 350)
-        .timestamp(1543600706)
-        .post_http(si);
-*/
-
-
-    //INFLUX DB STUFF
-    influxdb_cpp::server_info si(DB_ADDRESS, DB_PORT, DB_TABLE_NAME, DB_USER_NAME, DB_USER_PASS);
-    influxdb_cpp::builder()
-        .meas(MEASUREMENT_NAME)
-        .field(MEASUREMENT_FPS, 350)
-        .timestamp(1543600706)
-        .post_http(si);
 
     // init global vars
     initSharedMem();
@@ -344,5 +334,8 @@ void mouseMotionCB(int x, int y)
 
 void exitCB()
 {
+
+    Logger::writeLogFile();
+    std::cout << "Log file written" <<std::endl;
     clearSharedMem();
 }

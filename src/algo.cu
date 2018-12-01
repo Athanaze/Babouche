@@ -3,9 +3,8 @@
 #include <stdio.h>
 #include "Values.h"
 #include <GL/glut.h>
-#include <ctime>
 #include <thread>
-
+#include <chrono>
 extern "C" {
 	float *x, *y, *z, *m, *r, *g, *b, *fX, *fY, *fZ;
 	//render a cube
@@ -172,10 +171,6 @@ extern "C" {
 	}
 
 	__host__ int newtonHost() {
-
-		std::clock_t start0;
-		double duration0;
-		start0 = std::clock();
 		newton<<<CUDA_N_BLOCKS, CUDA_BLOCK_SIZE>>>(x,y,z,m,r,g,b,fX,fY,fZ);
 		// Wait for GPU to finish before accessing on host
 		cudaDeviceSynchronize();
@@ -188,15 +183,6 @@ extern "C" {
 			z[t] += fZ[t];
 			fZ[t] = 0.0f;
 		}
-
-
-		duration0 = ( std::clock() - start0 ) / (double) CLOCKS_PER_SEC;
-    	//std::cout<< 1 / duration0 <<" FPS" <<'\n';
-
-		//std::clock_t start;
-    	//double duration;
-    	//start = std::clock();
-
 		//Render the particles as a cube
 		for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
 			float x0 = 0.0f+x[i];
@@ -277,8 +263,6 @@ extern "C" {
 		    glVertex3f(x1,y1,z1);
 		    glEnd();
 		}
-		//duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    	//std::cout<<"Rendering stuff : "<< duration << " [s]"<<'\n';
 
 		/*cudaFree(x);
 		cudaFree(y);
