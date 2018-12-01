@@ -7,13 +7,13 @@ Uses CUDA for physics calculation
 Compile with src/compile.sh
 
 
-=============================
-FPS GRAPH
-=============================
+=============================<br/>
+FPS GRAPH<br/>
+=============================<br/>
 
-in tools/fpsGraph/fpsGraph.py
+in tools/fpsGraph/fpsGraph.py<br/>
 
-Setup pipenv :
-pipenv install matplotlib
-Run :
-pipenv run python3 fpsGraph.py
+Setup pipenv :<br/>
+pipenv install matplotlib<br/>
+Run :<br/>
+pipenv run python3 fpsGraph.py<br/>
