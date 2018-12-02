@@ -130,8 +130,8 @@ int initGLUT(int argc, char **argv)
 
     // register GLUT callback functions
     glutDisplayFunc(displayCB);
-    glutTimerFunc(33, timerCB, 33);             // redraw only every given millisec
-    //glutIdleFunc(idleCB);                       // redraw whenever system is idle
+    //glutTimerFunc(MILLISEC_REDRAW, timerCB, MILLISEC_REDRAW);             // redraw only every given millisec
+    glutIdleFunc(idleCB);                       // redraw whenever system is idle
     glutReshapeFunc(reshapeCB);
     glutKeyboardFunc(keyboardCB);
     glutMouseFunc(mouseCB);
@@ -209,7 +209,7 @@ void toPerspective()
     // set perspective viewing frustum
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0f, (float)(screenWidth)/screenHeight, 1.0f, 1000.0f); // FOV, AspectRatio, NearClip, FarClip
+    gluPerspective(FOV, (float)(screenWidth)/screenHeight, NEAR_CLIP, FAR_CLIP); // FOV, AspectRatio, NearClip, FarClip
 
     // switch to modelview matrix in order to set scene
     glMatrixMode(GL_MODELVIEW);
