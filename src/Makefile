@@ -27,7 +27,7 @@ OBJDIR_RELEASE = obj
 DEP_RELEASE =
 OUT_RELEASE = ../bin/babouche
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/Matrices.o $(OBJDIR_RELEASE)/Model.o $(OBJDIR_RELEASE)/main.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/Matrices.o $(OBJDIR_RELEASE)/main.o
 
 all: release
 
@@ -42,10 +42,6 @@ $(OUT_RELEASE): $(OBJ_RELEASE) $(DEP_RELEASE)
 $(OBJDIR_RELEASE)/Matrices.o: Matrices.cpp
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 	$(CPP) $(CFLAGS_RELEASE) $(INC_RELEASE) -c -o $(OBJDIR_RELEASE)/Matrices.o Matrices.cpp
-
-$(OBJDIR_RELEASE)/Model.o: Model.cpp
-	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
-	$(CPP) $(CFLAGS_RELEASE) $(INC_RELEASE) -c -o $(OBJDIR_RELEASE)/Model.o Model.cpp
 
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)

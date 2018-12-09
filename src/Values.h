@@ -1,34 +1,42 @@
 #pragma once
 #include <string>
 // N Particles related values
-const int NUMBER_OF_PARTICLES = 8000;
-const int N1 = NUMBER_OF_PARTICLES -1;
-const int N_THREAD = NUMBER_OF_PARTICLES * N1;
-const float CUBE_SIZE = 0.2f;
-
+const int N_PARTICLES = 1;
+//DONT CHANGE THIS VALUE
+const int NUMBER_OF_PARTICLES = 10 * N_PARTICLES;
 //Physics stuff
 const float G = 5.0f;
-const float FAKE_SPEED = 0.001f;
-const float MIN_SQUARED_DIST = 10.0f;
+const float FAKE_SPEED = 0.01f;
+const float MIN_SQUARED_DIST = 0.5f;
 
 //Particles setup
-const float RANDOM_RANGE_XYZ = 25.0f;
-const float MAX_MASS = 200.0f;
-
-//Cuda calculations
-const int CUDA_BLOCK_SIZE = 1024;
-const int CUDA_N_BLOCKS = ((NUMBER_OF_PARTICLES*N1) /CUDA_BLOCK_SIZE) +1;
+const float RANDOM_RANGE_XYZ = 200.0f;
+const float MAX_MASS = 99.0f;
 
 ////////////////////////////////////////////////
 // VIEW VALUES
 ////////////////////////////////////////////////
-const float FOV = 60.0f;
-const float NEAR_CLIP = 1.0f;
+const float FOV = 50.0f;
+const float NEAR_CLIP = 0.000001f;
 const float FAR_CLIP = 999999999.0f;
+const float POINT_SIZE = 4.0f;
 
+const int   SCREEN_WIDTH    = 2560;
+const int   SCREEN_HEIGHT   = 1440;
+const float CAMERA_DISTANCE = 5000.0f;
+const float DEG2RAD         = 3.141593f / 180;
+
+const char WINDOW_NAME[] = "Babouche Engine";
 ////////////////////////////////////////////////
 // LOGGING VALUES
 ////////////////////////////////////////////////
-
+const std::string START_MSG = "Babouche Engine";
 //Relative to the binary file
 const char FPS_LOG_PATH[] = "../out/logFiles/fpsLog.data";
+const int STRIDE_VALUE = 1;
+// DONT CHANGE THIS VALUE
+const int STRIDE = NUMBER_OF_PARTICLES / STRIDE_VALUE;
+
+
+//Other stride stuck
+const int STRIDE_2 = NUMBER_OF_PARTICLES / 10;
