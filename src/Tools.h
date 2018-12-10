@@ -6,10 +6,13 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include "Values.h"
 
 /*
-General-purpose tools for logging, measuring time, ...
+Tools for logging, measuring time, ...
 
 */
 
@@ -79,5 +82,37 @@ namespace Logger{
     }
 }
 
+namespace Resource{
+    std::vector<float> loadOBJ(){
+        using namespace std;
+        vector<float> result;
+        string line;
+        ifstream myfile("../res/suzi.obj");
+        if (myfile.is_open()){
+          while (getline (myfile,line)){
+              if(line.at(0) == 'v' && line.at(1) == ' '){
+                  istringstream iss(line);
+                  vector<string> tokens;
+                  copy(
+                      istream_iterator<string>(iss),
+                      istream_iterator<string>(),
+                      back_inserter(tokens)
+                  );
+
+                  //Convert string to float, and push to vector
+                  result.push_back(stof(tokens[1]));
+                  result.push_back(stof(tokens[2]));
+                  result.push_back(stof(tokens[3]));
+              }
+          }
+          myfile.close();
+        }
+        else{
+            cout << "Unable to open file";
+        }
+        // [x,y,z, x,y,z, x,y,z, ...]
+        return result;
+    }
+}
 
 #endif

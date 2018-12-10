@@ -7,6 +7,8 @@
 #include "Vectors.h"
 #include "Engine.h"
 #include "Tools.h"
+#include <cstdlib>
+#include <math.h>
 float *xParticle = new float[NUMBER_OF_PARTICLES];
 float *yParticle = new float[NUMBER_OF_PARTICLES];
 float *zParticle = new float[NUMBER_OF_PARTICLES];
@@ -19,27 +21,28 @@ namespace Model{
         for(int a = index; a < index+STRIDE; a++){
             for(int b = 0; b < NUMBER_OF_PARTICLES; b++){
                 if(a != b){
-                    float dx = xParticle[b] - xParticle[a];
-                    float dy = yParticle[b] - yParticle[a];
-                    float dz = zParticle[b] - zParticle[a];
+                    float dx = abs(xParticle[b] - xParticle[a]);
+                    float dy = abs(yParticle[b] - yParticle[a]);
+                    float dz = abs(zParticle[b] - zParticle[a]);
 
-                    float squaredDist = (dx*dx)+(dy*dy)+(dz*dz);
+/*
+                    if (dx < MIN_PROX){
+                        if(dy < MIN_PROX){
+                            if(dz < MIN_PROX){
+                                //The two particles are colliding
+                                Logger::print("C O L L I D I N G");
+                                //Result
+                                float rX = fXParticle[a] + fXParticle[b];
+                                float rY = fYParticle[a] + fYParticle[b];
+                                float rZ = fZParticle[a] + fZParticle[b];
 
-                    if(squaredDist > MIN_SQUARED_DIST){
-                        float force = G*((mParticle[b]*mParticle[a])/squaredDist);
-                        //Norme vecteur = distance au carre entre les deux points
-                        //RENDRE VECTEUR UNITAIRE
-
-                        //Ajouter la force dans la "file d'attente"
-                        fXParticle[a] += (dx / squaredDist)*force*FAKE_SPEED;
-                        fYParticle[a] += (dy / squaredDist)*force*FAKE_SPEED;
-                        fZParticle[a] += (dz / squaredDist)*force*FAKE_SPEED;
-                    }
-                    else{
-                        std::cout << squaredDist << "\n";
-                        mParticle[a] += mParticle[b];
-                        mParticle[b] = 0.0f;
-                    }
+                                //Add the result to a ONLY (b will calculate himself, later)
+                                xParticle[a] += fXParticle[a];
+                                yParticle[a] += fYParticle[a];
+                                zParticle[a] += fZParticle[a];
+                            }
+                        }
+                    }*/
                 }
             }
 
@@ -83,12 +86,35 @@ namespace Model{
 
     void setParticlesValues(){
         for(int i = 0; i < NUMBER_OF_PARTICLES; i++){
-            xParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
+            /*xParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
             yParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
-            zParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
-
+            zParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;*/
             mParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * MAX_MASS;
+
+            /*fXParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;
+            fYParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;
+            fZParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;*/
+
+            fXParticle[i] = 0.0f;
+            fYParticle[i] = 0.0f;
+            fZParticle[i] = 0.0f;
         }
+
+        std::vector<float> objData = Resource::loadOBJ();
+        if(objData.size() <= NUMBER_OF_PARTICLES){
+            for(int i = 0; i< objData.size();i+=3){
+                std::cout << objData[i] << "\n";
+                std::cout << objData[i+1] << "\n";
+                std::cout << objData[i+2] << "\n";
+                xParticle[i] = objData[i];
+                yParticle[i] = objData[i+1];
+                zParticle[i] = objData[i+2];
+            }
+        }
+        else{
+            Logger::print("Not enough particles for the OBJ model");
+        }
+
     }
 
 }
@@ -96,10 +122,8 @@ namespace Model{
 void mainLoop()
 {
     Frame::start();
-
     //All the logic / Model stuff is executed here, every frame
     Model::update();
-
     Frame::render();
     Frame::end();
 
@@ -156,6 +180,7 @@ namespace Frame{
 int main(int argc, char **argv)
 {
     Logger::print(START_MSG);
+
     // init global vars
     initSharedMem();
 
