@@ -103,13 +103,11 @@ namespace Model{
         std::vector<float> objData = Resource::loadOBJ();
         if(objData.size() <= NUMBER_OF_PARTICLES){
             for(int i = 0; i< objData.size();i+=3){
-                std::cout << objData[i] << "\n";
-                std::cout << objData[i+1] << "\n";
-                std::cout << objData[i+2] << "\n";
                 xParticle[i] = objData[i];
                 yParticle[i] = objData[i+1];
                 zParticle[i] = objData[i+2];
             }
+            Logger::print("Particles set to OBJ Model vertices");
         }
         else{
             Logger::print("Not enough particles for the OBJ model");
@@ -118,6 +116,51 @@ namespace Model{
     }
 
 }
+
+namespace Draw{
+    //        0   1   2   3   4   5
+    //ARGS: [x0, y0, z0, x1, y1, z1]
+    void vector(float *coord){
+        glLineWidth(VECTOR_WIDTH);
+        glBegin(GL_LINES);
+        glColor3f(VECTOR_COLOR_R, VECTOR_COLOR_G, VECTOR_COLOR_B);
+
+        // The line
+        glVertex3f(coord[0], coord[1], coord[2]);
+        glVertex3f(coord[3], coord[4], coord[5]);
+
+        // The arrow at the end of the vector
+        glVertex3f(coord[3], coord[4], coord[5]);
+        float eX;
+        float eY;
+        float eZ;
+
+        float dX = coord[3] - coord[0];
+        float dY = coord[4] - coord[1];
+        float dZ = coord[5] - coord[2];
+        if(dX > 0){
+            eX = coord[3] - (VECTOR_BACK_LENGTH*coord[3]);
+        }
+        else{
+            eX = coord[3] + (VECTOR_BACK_LENGTH*coord[3]);
+        }
+        if(dY > 0){
+            eY = coord[4] - (VECTOR_BACK_LENGTH*coord[4]);
+        }
+        else{
+            eY = coord[4] + (VECTOR_BACK_LENGTH*coord[4]);
+        }
+        if(dZ > 0){
+            eZ = coord[5] - (VECTOR_BACK_LENGTH*coord[5]);
+        }
+        else{
+            eZ = coord[5] + (VECTOR_BACK_LENGTH*coord[5]);
+        }
+        glVertex3f(eX, eY, eZ);
+        glEnd();
+    }
+}
+
 
 void mainLoop()
 {
@@ -165,6 +208,15 @@ namespace Frame{
             glVertex3f(xParticle[i], yParticle[i], zParticle[i]);
         }
         glEnd();
+        //ARGS: [x0, y0, z0, x1, y1, z1]
+        float a[6] = {0.0f, 0.0f, -1.0f, 3.0f, 0.0f, 2.0f};
+        Draw::vector(a);
+
+        float b[6] = {0.1f, -0.4f, -1.0f, 0.1f, -0.2f, 0.3f};
+        Draw::vector(b);
+
+        float c[6] = {-0.8f, 0.4f, 1.0f, -0.1f, 0.2f, 0.3f};
+        Draw::vector(c);
     }
 
     void end(){
