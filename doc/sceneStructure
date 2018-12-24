@@ -1,0 +1,33 @@
+Scene{
+
+    Model{
+
+        setup{
+            //Stuff
+        }
+
+        update{
+            //Stuff
+        }
+
+    }
+
+    Vue{
+        Vectors to draw
+    }
+
+    Controller{
+        custom controls for the scenes{
+
+            what to do when "x" is pressed{
+                //Stuff
+            }
+
+            custom button on the toolbar{
+                //Stuff
+            }
+
+        }
+    }
+
+}

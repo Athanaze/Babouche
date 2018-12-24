@@ -1,6 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-//VUE + CONTROLLER ////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 #include <GL/glut.h>
 #include <thread>
 #include "Matrices.h"
@@ -9,114 +6,6 @@
 #include "Tools.h"
 #include <cstdlib>
 #include <math.h>
-float *xParticle = new float[NUMBER_OF_PARTICLES];
-float *yParticle = new float[NUMBER_OF_PARTICLES];
-float *zParticle = new float[NUMBER_OF_PARTICLES];
-float *mParticle = new float[NUMBER_OF_PARTICLES];
-float *fXParticle = new float[NUMBER_OF_PARTICLES];
-float *fYParticle = new float[NUMBER_OF_PARTICLES];
-float *fZParticle = new float[NUMBER_OF_PARTICLES];
-namespace Model{
-    void particleUpdate(int index){
-        for(int a = index; a < index+STRIDE; a++){
-            for(int b = 0; b < NUMBER_OF_PARTICLES; b++){
-                if(a != b){
-                    float dx = abs(xParticle[b] - xParticle[a]);
-                    float dy = abs(yParticle[b] - yParticle[a]);
-                    float dz = abs(zParticle[b] - zParticle[a]);
-
-/*
-                    if (dx < MIN_PROX){
-                        if(dy < MIN_PROX){
-                            if(dz < MIN_PROX){
-                                //The two particles are colliding
-                                Logger::print("C O L L I D I N G");
-                                //Result
-                                float rX = fXParticle[a] + fXParticle[b];
-                                float rY = fYParticle[a] + fYParticle[b];
-                                float rZ = fZParticle[a] + fZParticle[b];
-
-                                //Add the result to a ONLY (b will calculate himself, later)
-                                xParticle[a] += fXParticle[a];
-                                yParticle[a] += fYParticle[a];
-                                zParticle[a] += fZParticle[a];
-                            }
-                        }
-                    }*/
-                }
-            }
-
-        }
-    }
-
-    void teleportSingleParticle(int i){
-        for(int a = i; a < i+STRIDE_2; a++){
-            xParticle[a] += fXParticle[a];
-            //fXParticle[a] = 0.0f;
-            yParticle[a] += fYParticle[a];
-            //fYParticle[a] = 0.0f;
-            zParticle[a] += fZParticle[a];
-            //fZParticle[a] = 0.0f;
-        }
-
-    }
-    //Teleport particles at new location
-    void teleportParticles(){
-        int numberOfThreads = NUMBER_OF_PARTICLES / STRIDE_2;
-        std::thread threads[numberOfThreads];
-        for (int t = 0; t < numberOfThreads; t ++){
-            threads[t] = std::thread(teleportSingleParticle, t*STRIDE_2);
-        }
-        for (int i = 0; i < numberOfThreads; i++){
-            threads[i].join();
-        }
-    }
-    //Called every frame
-    void update(){
-        int numberOfThreads = NUMBER_OF_PARTICLES / STRIDE;
-        std::thread threads[numberOfThreads];
-        for (int i = 0; i < numberOfThreads; i++) {
-            threads[i] = std::thread(particleUpdate, i*STRIDE);
-        }
-        for (int i = 0; i < numberOfThreads; i++){
-            threads[i].join();
-        }
-        teleportParticles();
-    }
-
-    void setParticlesValues(){
-        for(int i = 0; i < NUMBER_OF_PARTICLES; i++){
-            /*xParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
-            yParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;
-            zParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * RANDOM_RANGE_XYZ;*/
-            mParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * MAX_MASS;
-
-            /*fXParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;
-            fYParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;
-            fZParticle[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * FORCE_RANGE;*/
-
-            fXParticle[i] = 0.0f;
-            fYParticle[i] = 0.0f;
-            fZParticle[i] = 0.0f;
-        }
-
-        std::vector<float> objData = Resource::loadOBJ();
-        if(objData.size() <= NUMBER_OF_PARTICLES){
-            for(int i = 0; i< objData.size();i+=3){
-                xParticle[i] = objData[i];
-                yParticle[i] = objData[i+1];
-                zParticle[i] = objData[i+2];
-            }
-            Logger::print("Particles set to OBJ Model vertices");
-        }
-        else{
-            Logger::print("Not enough particles for the OBJ model");
-        }
-
-    }
-
-}
-
 namespace Draw{
     //        0   1   2   3   4   5
     //ARGS: [x0, y0, z0, x1, y1, z1]
@@ -161,17 +50,30 @@ namespace Draw{
     }
 }
 
+float *xParticle = new float[NUMBER_OF_PARTICLES];
+float *yParticle = new float[NUMBER_OF_PARTICLES];
+float *zParticle = new float[NUMBER_OF_PARTICLES];
+float *mParticle = new float[NUMBER_OF_PARTICLES];
+float *fXParticle = new float[NUMBER_OF_PARTICLES];
+float *fYParticle = new float[NUMBER_OF_PARTICLES];
+float *fZParticle = new float[NUMBER_OF_PARTICLES];
+// SCENE HEADER MUST BE INCLUDED AT THE END
+#include "SuziScene.h"
+//#include "NewtonScene.h"
 
 void mainLoop()
 {
     Frame::start();
+
     //All the logic / Model stuff is executed here, every frame
-    Model::update();
+    Scene::Model::b_update();
+
     Frame::render();
     Frame::end();
 
 }
 
+// Scene agnostic
 namespace Frame{
     /*
         These functions must be called in order !
@@ -196,27 +98,20 @@ namespace Frame{
         matrixModelView = matrixView * matrixModel;
         // copy modelview matrix to OpenGL
         glLoadMatrixf(matrixModelView.get());
-
     }
 
     void render(){
         //Render the particles
-        //glColor3f(0.5f, 0.0f, 0.5f);
         glBegin(GL_POINTS);
         for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
+            //Change the color of each particle according to the particle's mass
             glColor3f(0.01f*mParticle[i], 0.0f, 0.02f*mParticle[i]);
             glVertex3f(xParticle[i], yParticle[i], zParticle[i]);
         }
         glEnd();
-        //ARGS: [x0, y0, z0, x1, y1, z1]
-        float a[6] = {0.0f, 0.0f, -1.0f, 3.0f, 0.0f, 2.0f};
-        Draw::vector(a);
 
-        float b[6] = {0.1f, -0.4f, -1.0f, 0.1f, -0.2f, 0.3f};
-        Draw::vector(b);
-
-        float c[6] = {-0.8f, 0.4f, 1.0f, -0.1f, 0.2f, 0.3f};
-        Draw::vector(c);
+        //Call scene-specific draw calls
+        Scene::Vue::b_render();
     }
 
     void end(){
@@ -236,7 +131,7 @@ int main(int argc, char **argv)
     // init global vars
     initSharedMem();
 
-    Model::setParticlesValues();
+    Scene::Model::b_setup();
 
     // register exit callback
     atexit(Callback::exitBabouche);
@@ -366,10 +261,9 @@ namespace Callback{
             exitBabouche();
             break;
 
-        case ' ':
-            break;
         default:
-            ;
+            Scene::Controller::b_kb(key);
+            break;
         }
     }
 

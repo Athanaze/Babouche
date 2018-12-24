@@ -2,6 +2,8 @@
 #include <string>
 // N Particles related values
 const int N_PARTICLES = 10000;
+//const int N_PARTICLES = 100;
+
 //DONT CHANGE THIS VALUE
 const int NUMBER_OF_PARTICLES = 10 * N_PARTICLES;
 //Physics stuff
